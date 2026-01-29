@@ -1,4 +1,7 @@
 streamlit
 transformers
+torch
+torchvision
 scikit-learn
 numpy<2.0
+pandas
