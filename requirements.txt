@@ -5,3 +5,4 @@ torchvision
 scikit-learn
 numpy<2.0
 pandas
+xgboost>=2.0.0

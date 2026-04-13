@@ -1,15 +1,28 @@
 """
-Frontend module for Research Paper Virality Predictor UI
+Frontend - Pre-Publication Virality Predictor
 """
-from .styles import get_custom_css
-from .components import display_prediction_result, display_metrics
-from .tabs import render_single_prediction_tab, render_comparison_tab, render_examples_tab
+from .styles import get_css
+from .components import (
+    render_prediction_card,
+    render_model_metrics,
+    render_feature_breakdown,
+    render_sidebar,
+)
+from .tabs import (
+    render_predict_tab,
+    render_compare_tab,
+    render_insights_tab,
+    render_examples_tab,
+)
 
 __all__ = [
-    'get_custom_css',
-    'display_prediction_result',
-    'display_metrics',
-    'render_single_prediction_tab',
-    'render_comparison_tab',
-    'render_examples_tab'
+    "get_css",
+    "render_prediction_card",
+    "render_model_metrics",
+    "render_feature_breakdown",
+    "render_sidebar",
+    "render_predict_tab",
+    "render_compare_tab",
+    "render_insights_tab",
+    "render_examples_tab",
 ]
