@@ -165,6 +165,8 @@ def render_explanation(result: dict):
     if kf.get("authors_imputed"):
         tips.append("Author count was not provided and was imputed - supply it for a sharper prediction")
 
+    st.markdown("")
+
     with st.expander("🔍 Explanation", expanded=True):
         if good:
             st.markdown("**✅ What helped**")

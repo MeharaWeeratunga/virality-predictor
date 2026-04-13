@@ -93,9 +93,14 @@ with tab4:
 # Footer
 st.markdown("---")
 st.markdown(
+    '<p style="text-align:center;color:var(--muted);font-size:1rem;font-weight:600">'
+    'PrePubVirality: Research Paper Virality Predictor | FYP 2026'
+    '</p>',
+    unsafe_allow_html=True
+)
+st.markdown(
     '<p style="text-align:center;color:var(--muted);font-size:0.78rem;">'
-    'Pre-Publication Virality Predictor · FYP 2025 · '
-    'CS + Medicine · 94,435 papers · SPECTER2 fine-tuned · '
+    'CS + Medicine · 94,435 papers · '
     'XGBoost ROC-AUC 0.9076 · Ensemble ROC-AUC 0.9073 (primary test 2023–2025)'
     '</p>',
     unsafe_allow_html=True
