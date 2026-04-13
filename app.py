@@ -1,84 +1,107 @@
 """
-PrePubVirality
-Main Streamlit Application
+Pre-Publication Virality Predictor
+Streamlit app · CS + Medicine · Altmetric labels · SPECTER2 fine-tuned
 """
 import streamlit as st
 
-# Backend imports
-from backend.model_loader import load_model, load_specter, get_model_components
-from backend.predictor import predict_virality
-
-# Frontend imports
-from frontend.styles import get_custom_css
-from frontend.components import render_sidebar
-from frontend.tabs import (
-    render_single_prediction_tab,
-    render_comparison_tab,
-    render_examples_tab
-)
-
 # Page config
 st.set_page_config(
-    page_title="PrePubVirality: Research Paper Virality Predictor",
+    page_title="Virality Predictor",
     page_icon="🔬",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded",
 )
 
-# Apply custom CSS
-st.markdown(get_custom_css(), unsafe_allow_html=True)
+# Backend
+from backend.model_loader import load_bundle, load_specter
+from backend.predictor    import predict_virality
+
+# Frontend
+from frontend.styles     import get_css
+from frontend.components import render_sidebar
+from frontend.tabs       import (
+    render_predict_tab,
+    render_compare_tab,
+    render_insights_tab,
+    render_examples_tab,
+)
+
+# Inject CSS
+st.markdown(get_css(), unsafe_allow_html=True)
 
 # Load models
-saved_model = load_model()
-tokenizer, specter_model, device = load_specter()
-model_components = get_model_components(saved_model)
+BUNDLE_PATH = "viral_predictor_v12_altmetric_no_hindex.pkl"
 
-# Check if models loaded successfully
-if saved_model is None or tokenizer is None or model_components is None:
-    st.error("⚠️ Models failed to load. Please ensure viral_predictor.pkl is in the same directory.")
+bundle = load_bundle(BUNDLE_PATH)
+if bundle is None:
+    st.error(
+        "⚠️ Could not load model bundle. "
+        f"Ensure `{BUNDLE_PATH}` is in the same directory as `app.py`."
+    )
     st.stop()
 
-# Header
-st.markdown(
-    '<div class="main-header">🔬 Research Paper Virality Predictor</div>', 
-    unsafe_allow_html=True
-)
-st.markdown(
-    '<div class="sub-header">Predict if your research paper will go viral before publication</div>', 
-    unsafe_allow_html=True
-)
+tok, mdl, device = load_specter(bundle)
+if tok is None:
+    st.error("⚠️ SPECTER2 failed to load. Check Drive paths in bundle.")
+    st.stop()
 
 # Sidebar
 with st.sidebar:
-    threshold_mode = render_sidebar('optimal')
+    settings = render_sidebar(bundle)
 
-# Create prediction function wrapper
-def predict_fn(paper_data, threshold_mode='optimal'):
+# Prediction wrapper
+def _predict(paper: dict) -> dict:
     return predict_virality(
-        paper_data,
-        model_components,
-        tokenizer,
-        specter_model,
-        device,
-        threshold_mode
+        paper      = paper,
+        bundle     = bundle,
+        tok        = tok,
+        mdl        = mdl,
+        device     = device,
+        use_ensemble = settings.get("use_ensemble", True),
     )
 
-# Main content tabs
-tab1, tab2, tab3 = st.tabs(["📝 Single Prediction", "⚖️ Compare Papers", "📚 Examples"])
+# Masthead
+st.markdown("""
+<div class="masthead">
+    <h1 class="masthead-title">🔬 PrePubVirality</h1>
+    <p class="masthead-sub">
+        Predict if your research paper will go viral before publication
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
+# Tabs
+tab1, tab2, tab3, tab4 = st.tabs([
+    "📝 Single Prediction",
+    "⚖️ Compare Papers",
+    "📊 Model Insights",
+    "📚 Examples",
+])
 
 with tab1:
-    render_single_prediction_tab(predict_fn, threshold_mode)
+    render_predict_tab(_predict, settings)
 
 with tab2:
-    render_comparison_tab(predict_fn)
+    render_compare_tab(_predict, settings)
 
 with tab3:
-    render_examples_tab()
+    render_insights_tab(bundle)
+
+with tab4:
+    render_examples_tab(_predict, settings)
 
 # Footer
 st.markdown("---")
-st.markdown("""
-<div style="text-align: center; color: #666; padding: 2rem;">
-    <p><strong>PrePubVirality: Research Paper Virality Predictor</strong> | FYP Project 2025</p>
-    <p>Model trained on 1,565 arXiv papers | Primary domains: Physics, Mathematics, Astronomy</p>
-</div>
-""", unsafe_allow_html=True)
+st.markdown(
+    '<p style="text-align:center;color:var(--muted);font-size:1rem;font-weight:600">'
+    'PrePubVirality: Research Paper Virality Predictor | FYP 2026'
+    '</p>',
+    unsafe_allow_html=True
+)
+st.markdown(
+    '<p style="text-align:center;color:var(--muted);font-size:0.78rem;">'
+    'CS + Medicine · 94,435 papers · '
+    'XGBoost ROC-AUC 0.9076 · Ensemble ROC-AUC 0.9073 (primary test 2023–2025)'
+    '</p>',
+    unsafe_allow_html=True
+)
