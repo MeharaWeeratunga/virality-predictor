@@ -5,7 +5,7 @@
 
 ## Project Overview 📖
 
-This project is a machine learning system that predicts whether a scientific research paper will go viral — attracting significant social media and news attention — using only information available **before publication**. No citation data, no post-publication metrics.
+This project is a machine learning system that predicts whether a scientific research paper will go viral, attracting significant social media and news attention, using only information available **before publication**. No citation data, no post-publication metrics.
 
 Virality is defined as a paper ranking in the **top 10% of Altmetric attention scores** within its publication year cohort. Altmetric scores aggregate attention from news outlets, Twitter/X, blogs, policy documents, and Mendeley readership.
 
@@ -13,10 +13,16 @@ The system is deployed as an interactive Streamlit web application where researc
 
 ---
 
+## 🚀 Live Demo
+
+**Web App:** https://your-streamlit-link.streamlit.app
+
+---
+
 ## Objectives 🎯
 
 - Predict whether a research paper will go viral at the time of publication
-- Use **only pre-publication signals** — title, abstract, venue, author count, publication year
+- Use **only pre-publication signals** - title, abstract, venue, author count, publication year
 - Leverage fine-tuned **SPECTER2** domain-specific transformer embeddings for semantic understanding
 - Provide an interpretable web interface with probability outputs and feature explanations
 - Demonstrate fairness-aware design by removing author h-index features
@@ -30,7 +36,7 @@ Users enter:
 - Paper title and abstract
 - Research field (Computer Science or Medicine)
 - Publication type, venue/journal, reference count, author count, publication year
-- All metadata fields are **optional** — mean imputation handles missing values
+- All metadata fields are **optional** - mean imputation handles missing values
 
 The system outputs:
 - Viral / Not Viral prediction
@@ -78,7 +84,7 @@ Four pre-loaded examples covering viral Medicine RCTs and non-viral CS papers fo
 | Title structure | title\_len, title\_has\_question, title\_has\_colon, title\_has\_number |
 | Abstract structure | abstract\_len, abstract\_has\_eq, abstract\_has\_table |
 
-**Note**: Author h-index was deliberately excluded on fairness grounds — it penalises early-career researchers and papers by authors with limited publication history.
+**Note**: Author h-index was deliberately excluded on fairness grounds. It penalises early-career researchers and papers by authors with limited publication history.
 
 ### SPECTER2 Fine-Tuning
 SPECTER2 (`allenai/specter2_base`) is fine-tuned on virality labels using:
@@ -93,14 +99,14 @@ SPECTER2 (`allenai/specter2_base`) is fine-tuned on virality labels using:
 | XGBoost | Raw embeddings + metadata, raw probabilities (no calibration wrapper) |
 | Random Forest | Raw embeddings + metadata, balanced subsample |
 | Logistic Regression | PCA(100) embeddings + metadata |
-| Baseline | Metadata only — quantifies embedding contribution |
+| Baseline | Metadata only - quantifies embedding contribution |
 | **Ensemble** | **XGB×0.4 + LR×0.4 + RF×0.2** |
 
 ### Labelling Methodology
 - **Per-cohort labels**: viral threshold computed within each publication year independently, preventing label drift across years
-- **2026 exclusion**: papers published in 2026 are excluded from primary test metrics — at the March 2026 Altmetric snapshot they had ≤3 months of exposure, making viral labels structurally unreliable. They are evaluated separately for context (ROC ≈ 0.785, expected degradation)
+- **2026 exclusion**: papers published in 2026 are excluded from primary test metrics, at the March 2026 Altmetric snapshot they had ≤3 months of exposure, making viral labels structurally unreliable. They are evaluated separately for context (ROC ≈ 0.785, expected degradation)
 - **Mature papers**: test papers < 12 months old at Altmetric snapshot excluded from primary metrics
-- **Temporal split**: train ≤ 2022, test 2023–2025 — strictly no future data leakage
+- **Temporal split**: train ≤ 2022, test 2023–2025, strictly no future data leakage
 
 ---
 
